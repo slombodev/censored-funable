@@ -8,7 +8,8 @@ import { CATEGORIES, generateHeadline, shuffle } from './headlines.js';
 const PORT = Number(process.env.PORT) || 3000;
 const MAX_PLAYERS = 12;
 const MIN_PLAYERS = 2;
-const DRAW_TIMES = [60, 90, 120];
+const DRAW_TIMES = [60, 90, 120, 180, 240, 300];
+const MAX_GUESTS = 30;
 const VOTE_SECONDS = 45;
 const COLLECT_GRACE_MS = 3000; // margen para que lleguen los dibujos al acabar el tiempo
 const EMPTY_ROOM_TTL_MS = 10 * 60_000;
@@ -50,8 +51,10 @@ function createRoom() {
     hostId: null,
     phase: 'lobby',
     round: 0,
-    settings: { rounds: 3, drawTime: 90, categories: Object.keys(CATEGORIES) },
+    settings: { rounds: 3, drawTime: 120, categories: Object.keys(CATEGORIES) },
     players: new Map(),
+    // Personas que no juegan pero salen en los titulares; cualquiera las añade en la lobby.
+    guests: [],
     entries: [],
     usedTemplates: new Set(),
     timer: null,
@@ -67,8 +70,10 @@ function createRoom() {
 
 const connectedPlayers = (room) => [...room.players.values()].filter((p) => p.connected);
 
+const trimName = (raw) => String(raw ?? '').replace(/\s+/g, ' ').trim().slice(0, 16);
+
 function cleanName(raw, room, pid) {
-  const base = String(raw ?? '').replace(/\s+/g, ' ').trim().slice(0, 16);
+  const base = trimName(raw);
   if (!base) return null;
   const taken = new Set([...room.players.values()].filter((p) => p.id !== pid).map((p) => p.name.toLowerCase()));
   let name = base;
@@ -110,10 +115,13 @@ function startRound(room) {
   room.votes.clear();
   const players = connectedPlayers(room);
   const names = players.map((p) => p.name);
+  // Un jugador que entró con el mismo nombre que un invitado no debe salir dos veces en un titular.
+  const taken = new Set([...room.players.values()].map((p) => p.name.toLowerCase()));
+  const guests = room.guests.map((g) => g.name).filter((n) => !taken.has(n.toLowerCase()));
   room.entries = players.map((p) => ({
     id: randomUUID(),
     authorId: p.id,
-    ...generateHeadline(room.settings.categories, names, room.usedTemplates),
+    ...generateHeadline(room.settings.categories, names, room.usedTemplates, guests),
     submitted: false,
     img: null,
     imgId: null,
@@ -218,6 +226,8 @@ function snapshot(room, pid) {
     me: pid,
     settings: room.settings,
     categories: CATEGORY_META,
+    drawTimes: DRAW_TIMES,
+    guests: room.guests,
     collecting: room.collecting,
     timer: room.timer ? { remaining: Math.max(0, room.timer.endsAt - Date.now()), total: room.timer.total } : null,
     players: [...room.players.values()].map((p) => ({
@@ -346,6 +356,30 @@ io.on('connection', (socket) => {
     reply({ ok: true });
     broadcast(room);
   }, { hostOnly: true });
+
+  on('guest:add', (room, player, { name }, reply) => {
+    if (room.phase !== 'lobby') return reply({ ok: false, error: 'Solo se pueden añadir en la lobby.' });
+    const clean = trimName(name);
+    if (!clean) return reply({ ok: false, error: 'Escribe un nombre.' });
+    if (room.guests.length >= MAX_GUESTS) return reply({ ok: false, error: `Máximo ${MAX_GUESTS} invitados.` });
+    const lower = clean.toLowerCase();
+    const exists = room.guests.some((g) => g.name.toLowerCase() === lower)
+      || [...room.players.values()].some((p) => p.name.toLowerCase() === lower);
+    if (exists) return reply({ ok: false, error: 'Ese nombre ya está en la sala.' });
+    room.guests.push({ id: randomUUID(), name: clean, addedBy: player.id });
+    reply({ ok: true });
+    broadcast(room);
+  });
+
+  // Lo quita quien lo añadió o el host.
+  on('guest:remove', (room, player, { id }, reply) => {
+    const guest = room.guests.find((g) => g.id === id);
+    if (room.phase !== 'lobby' || !guest) return reply({ ok: false });
+    if (guest.addedBy !== player.id && room.hostId !== player.id) return reply({ ok: false, error: 'Solo quien lo añadió o el host puede quitarlo.' });
+    room.guests = room.guests.filter((g) => g !== guest);
+    reply({ ok: true });
+    broadcast(room);
+  });
 
   on('game:start', (room, _p, _in, reply) => {
     if (room.phase !== 'lobby') return reply({ ok: false });

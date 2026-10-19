@@ -37,6 +37,7 @@ export class Board {
     canvas.addEventListener('pointermove', (e) => this.#move(e));
     canvas.addEventListener('pointerup', () => this.#up());
     canvas.addEventListener('pointercancel', () => this.#up());
+    canvas.addEventListener('contextmenu', (e) => e.preventDefault()); // clic derecho = borrar
     textInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); this.commitText(); }
       if (e.key === 'Escape') { this.pendingText = null; this.input.hidden = true; }
@@ -127,21 +128,22 @@ export class Board {
   }
 
   #down(e) {
-    if (this.locked || e.button > 0) return;
+    const rightClick = e.button === 2;
+    if (this.locked || (e.button > 0 && !rightClick)) return;
     e.preventDefault();
-    if (this.tool === 'text') return this.#openText(e);
+    if (this.tool === 'text' && !rightClick) return this.#openText(e);
     this.commitText();
-    if (this.tool === 'fill') return this.#addFill(this.#point(e));
+    if (this.tool === 'fill' && !rightClick) return this.#addFill(this.#point(e));
     this.canvas.setPointerCapture(e.pointerId);
     const { size } = this;
-    if (SHAPES.includes(this.tool)) {
+    if (SHAPES.includes(this.tool) && !rightClick) {
       const p = this.#point(e);
       // La vista previa se pinta sobre una copia del lienzo en vez de repintar todo el historial.
       this.snapshot = this.ctx.getImageData(0, 0, BOARD_W, BOARD_H);
       this.shape = { type: 'shape', shape: this.tool, color: this.color, size, from: p, to: p };
       return;
     }
-    const eraser = this.tool === 'eraser';
+    const eraser = this.tool === 'eraser' || rightClick;
     this.stroke = {
       type: 'stroke',
       color: eraser ? BG : this.color,

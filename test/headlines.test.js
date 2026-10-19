@@ -20,3 +20,14 @@ test('Picante genera titulares con censura', () => {
   assert.equal(h.category, 'picante');
   assert.equal(h.parts.filter((p) => p.type === 'blank').length, 1);
 });
+
+test('los invitados salen en los titulares, pero {A} siempre es un jugador', () => {
+  const used = new Set();
+  const all = Array.from({ length: 60 }, () => generateHeadline(['caos'], ['Ana', 'Bo'], used, ['Shakira', 'El profe']));
+  assert.ok(all.every((h) => ['Ana', 'Bo'].includes(names(h)[0]) || names(h).includes('Ana') || names(h).includes('Bo')));
+  assert.ok(all.some((h) => names(h).includes('Shakira') || names(h).includes('El profe')));
+  // Con 1 jugador + 2 invitados ya caben plantillas de 3 nombres.
+  const solo = Array.from({ length: 40 }, () => generateHeadline(['caos'], ['Ana'], new Set(), ['Shakira', 'Bo']));
+  assert.ok(solo.every((h) => names(h).includes('Ana')));
+  assert.ok(solo.some((h) => new Set(names(h)).size === 3));
+});

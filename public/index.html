@@ -60,6 +60,13 @@
         <div class="panel">
           <h2 class="panel-title">Acusados <span class="count" id="player-count"></span></h2>
           <ul class="player-list" id="player-list"></ul>
+          <h2 class="panel-title guests-title">Invitados a la funa <span class="count" id="guest-count"></span></h2>
+          <p class="hint">Gente que no juega pero sale en los titulares. Cualquiera puede añadir.</p>
+          <form class="guest-form" id="guest-form">
+            <input id="guest-name" maxlength="16" autocomplete="off" placeholder="ej. Tu ex, Shakira, el profe…" aria-label="Nombre del invitado">
+            <button class="btn btn-pink" type="submit">Añadir</button>
+          </form>
+          <ul class="guest-list" id="guest-list"></ul>
         </div>
         <div class="panel">
           <h2 class="panel-title">Reglas del juicio <span class="count" id="settings-note"></span></h2>

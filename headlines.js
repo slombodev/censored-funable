@@ -18,6 +18,16 @@ export const CATEGORIES = {
       'Pillan a {A} con ___ en el jacuzzi y desde fuera se oyen ruidos raros.',
       '{A} lleva meses quedando a escondidas con ___. {B} los vio salir de un hotel.',
       'El fondo de pantalla secreto de {A} es una foto suya abrazando a ___.',
+      '{A} tiene una cuenta secreta de Instagram dedicada exclusivamente a ___.',
+      'En el armario de {A} encuentran un altar dedicado a ___.',
+      '{A} confiesa que de pequeño lloraba cada noche por culpa de ___.',
+      'El testamento de {A} deja toda su herencia a ___. {B} no se lo cree.',
+      '{B} descubre que {A} tiene un segundo trabajo: ___.',
+      'La contraseña de todo de {A} es "___123".',
+      'Pillan a {A} besándose a escondidas con ___ detrás del bar.',
+      '{A} tiene enmarcada en el salón una foto de ___ en bañador.',
+      'El contacto que {A} tiene guardado como "Mamá 2" es en realidad ___.',
+      '{A} confiesa que perdió la virginidad con ___.',
     ],
   },
   madrugada: {
@@ -37,6 +47,16 @@ export const CATEGORIES = {
       'A las 4 AM sale de casa de {A} ___ con la camisa al revés.',
       '{A} se despierta en la cama de ___ y no recuerda absolutamente nada.',
       'Los vecinos de {A} llaman a la policía: en su balcón está ___ cantando rancheras.',
+      'A las 5 AM {A} sube una story llorando y comiendo ___.',
+      '{A} vuelve de fiesta y se pelea a gritos con ___ en el portal.',
+      '{B} encuentra a {A} a las 4 AM en la nevera hablando con ___.',
+      'El Uber de {A} a las 3 AM termina en ___.',
+      '{A} manda un mensaje de voz borracho que solo dice "___".',
+      '{A} pide un kebab a las 5 AM y se lo trae ___.',
+      'A las 3 AM {A} le escribe "te echo de menos" a ___.',
+      '{A} se cuela en la fiesta equivocada y acaba bailando lento con ___.',
+      'Al amanecer, {B} encuentra a {A} durmiendo en la bañera con ___.',
+      '{A} llama a las 4 AM a ___ para confesarle su amor. Le contesta su madre.',
     ],
   },
   crimenes: {
@@ -56,6 +76,16 @@ export const CATEGORIES = {
       '{A} es detenido junto a su cómplice: ___.',
       'Las cámaras graban a {A} y a ___ huyendo de un Mercadona con un carrito lleno.',
       '{B} identifica en la rueda de reconocimiento a {A} y a ___.',
+      '{A} es arrestado por robar ___ del zoo.',
+      'Se busca: {A}, acusado de ___ en plena misa.',
+      '{A} sale en las noticias por intentar sobornar a un policía con ___.',
+      '{B} paga la fianza de {A} con ___.',
+      '{A} es expulsado de un crucero por ___.',
+      'El FBI confisca el ordenador de {A}: estaba lleno de ___.',
+      '{A} se entrega a la policía tras ser delatado por ___.',
+      'Detienen a {A} por acosar a ___ por WhatsApp con stickers.',
+      '{A} atraca un banco disfrazado de ___. Lo reconoce hasta su abuela.',
+      'El juez condena a {A} a pasar 100 horas de servicios comunitarios con ___.',
     ],
   },
   discord: {
@@ -75,6 +105,16 @@ export const CATEGORIES = {
       '{A} comparte cámara y detrás aparece ___ en toalla.',
       '{A} deja a {B} en visto toda la noche porque estaba en llamada privada con ___.',
       'Se filtra que el misterioso moderador que banea a {A} es en realidad ___.',
+      '{A} gana una discusión en #general mandando ___.',
+      'El bot del server empieza a mandarle a {A} ___ cada hora.',
+      '{A} se pone el apodo "___" y {B} lo denuncia a Discord.',
+      '{A} hace un stream de 9 horas haciendo ___. Lo ven 2 personas.',
+      'El soundboard de {A} solo tiene un sonido: ___.',
+      '{A} se une a un server de ___ y ahora es el admin.',
+      '{A} mete en la llamada a ___ sin avisar a nadie.',
+      'En la llamada de anoche se escucha a {A} gimiendo y luego a ___ riéndose.',
+      '{A} confiesa en un audio que su e-girl de confianza es ___.',
+      'El nuevo del server que todos creían un bot es en realidad ___.',
     ],
   },
   todos: {
@@ -94,6 +134,16 @@ export const CATEGORIES = {
       'Toda la sala sabe que el crush de {A} es ___. Menos {A}.',
       '{A} anuncia su compromiso con ___. Nadie fue invitado a la boda.',
       '{B} pilla a {A} haciéndose un tatuaje con la cara de ___.',
+      'El grupo decide que si hay un apocalipsis, a {A} lo dejarían atrás por ___.',
+      '{A} es nombrado "el más probable de acabar ___".',
+      '{A} demanda a todo el grupo por ___.',
+      'Si {A} tuviera un superpoder, sería ___. Y {B} ya lo está temiendo.',
+      'El grupo vota que el peor regalo de {A} fue ___.',
+      '{A} confiesa que el único del grupo que le cae bien es ___.',
+      'Todos coinciden en que {A} acabará casado con ___.',
+      '{A} cambia al grupo entero por ___.',
+      'La primera persona a la que {A} llamaría para esconder un cadáver es ___.',
+      'El grupo descubre que {A} tiene de fondo de pantalla a ___.',
     ],
   },
   parejas: {
@@ -117,6 +167,16 @@ export const CATEGORIES = {
       '{A} deja a {B} por ___. El grupo no lo supera.',
       'Pillan a {A} con ___ en el jacuzzi mientras {B} esperaba fuera con flores.',
       '{B} descubre que {A} le pone los cuernos con ___.',
+      '{A} y {B} se van de luna de miel a ___.',
+      '{A} y {B} adoptan juntos a ___ como mascota.',
+      'El regalo de aniversario de {A} para {B}: ___.',
+      '{A} y {B} rompen por una discusión sobre ___.',
+      '{A} y {B} se reconcilian en mitad de ___.',
+      '{A} y {B} protagonizan un trío con ___.',
+      'En la boda de {A} y {B}, el que dice "yo me opongo" es ___.',
+      '{A} le es infiel a {B} con ___. En su cama.',
+      'El hijo secreto de {A} y {B} se parece sospechosamente a ___.',
+      '{A} sueña cada noche con {B} y ___ en la misma cama.',
     ],
   },
   picante: {
@@ -140,6 +200,16 @@ export const CATEGORIES = {
       '{A} llega tarde a todo porque "estaba ocupado" con ___.',
       'Tras la fiesta, {A} amanece desnudo abrazado a ___.',
       'El vecino de {A} denuncia ruidos toda la noche: estaba con ___.',
+      '{A} confiesa que su posición favorita se llama "___".',
+      '{A} se excita cada vez que ve ___.',
+      'Lo que {A} esconde en el cajón de la ropa interior: ___.',
+      '{A} y {B} hacen un "juego de rol" en el que uno es ___.',
+      'El juguete favorito de {A} tiene forma de ___.',
+      '{A} manda nudes por error al grupo de la familia junto a ___.',
+      '{A} tiene una noche loca con ___ y se entera todo el edificio.',
+      '{B} pilla a {A} enviándole fotos subidas de tono a ___.',
+      'La fantasía secreta de {A} es un trío con {B} y ___.',
+      '{A} sale del motel a las 6 AM de la mano de ___.',
     ],
   },
   caos: {
@@ -163,6 +233,16 @@ export const CATEGORIES = {
       '{A} y {B} se pelean en la boda de {C} por culpa de ___.',
       '{A} presenta a su nueva pareja en la cena familiar: ___. {B} se atraganta.',
       '{A}, {B} y ___ son pillados juntos en una despedida de soltero en Benidorm.',
+      '{A}, {B} y {C} intentan cocinar juntos y terminan ___.',
+      '{A} le roba el novio a {B} y {C} lo graba todo haciendo ___.',
+      '{A}, {B} y {C} montan una secta. Su dios es ___.',
+      '{C} organiza una intervención porque {A} y {B} son adictos a ___.',
+      '{A}, {B} y {C} ganan la lotería y se lo gastan todo en ___.',
+      '{A} y {B} intentan rescatar a {C} de ___.',
+      '{A}, {B} y {C} se quedan encerrados en un ascensor con ___.',
+      '{A} deja a {B} plantado en el altar y se fuga con ___.',
+      '{C} descubre que {A} y {B} se pelean en secreto por ___.',
+      '{A}, {B} y ___ se van juntos de vacaciones a Cancún. Vuelven casados.',
     ],
   },
 };
@@ -194,11 +274,13 @@ function toParts(template, names) {
 }
 
 // `used` es un Set por sala para no repetir titulares hasta agotar el mazo.
-export function generateHeadline(categoryKeys, playerNames, used) {
+// `extraNames` son invitados que añaden los jugadores en la lobby: salen como {B}/{C}, pero {A} siempre es un jugador.
+export function generateHeadline(categoryKeys, playerNames, used, extraNames = []) {
+  const total = playerNames.length + extraNames.length;
   const fitting = (keys) => keys.flatMap((key) =>
     CATEGORIES[key].templates
       .map((template, i) => ({ key, template, id: `${key}:${i}` }))
-      .filter(({ template }) => namesNeeded(template) <= playerNames.length),
+      .filter(({ template }) => namesNeeded(template) <= total),
   );
   // Con pocos jugadores conectados, una selección solo de "Parejas" o "Caos" puede no tener plantillas válidas.
   let fits = fitting(categoryKeys);
@@ -210,6 +292,7 @@ export function generateHeadline(categoryKeys, playerNames, used) {
   }
   const chosen = pick(fresh);
   used.add(chosen.id);
-  const [A, B, C] = shuffle(playerNames);
+  const [A, ...others] = shuffle(playerNames);
+  const [B, C] = shuffle([...others, ...extraNames]);
   return { category: chosen.key, parts: toParts(chosen.template, { A, B, C }) };
 }

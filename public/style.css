@@ -279,6 +279,32 @@ input::placeholder { color: #5d576b; }
 .player.fresh { animation: slide-in .5s var(--ease-spring) both; }
 @keyframes slide-in { from { opacity: 0; transform: translateX(-18px) scale(.96); } }
 .player.offline { opacity: .45; }
+.guests-title { margin-top: 24px; }
+.guest-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; margin-top: 12px; }
+.guest-form input { padding: 11px 14px; font-size: 16px; }
+.guest-list { list-style: none; margin: 12px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.guest {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 6px 6px 12px;
+  border-radius: 999px;
+  background: var(--ink-2);
+  border: 1px dashed var(--line-2);
+  font-weight: 700;
+}
+.guest:not(:has(button)) { padding-right: 12px; }
+.guest button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--line);
+  color: var(--muted);
+  font: 800 16px/1 var(--ui);
+}
+.guest button:hover { background: var(--pink); color: #fff; }
 .pname { flex: 1; min-width: 0; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tag { padding: 4px 8px; border-radius: 6px; background: var(--line); font: 800 11px/1 var(--ui); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
 .tag-host { background: var(--lime); color: var(--ink); }

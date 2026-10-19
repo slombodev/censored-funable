@@ -48,6 +48,17 @@ test('flujo completo de una ronda', async () => {
     assert.equal((await a.call('room:settings', { rounds: 1, drawTime: 60, categories: ['discord', 'nope'] })).ok, true);
     const configured = await a.until((s) => s.settings.rounds === 1);
     assert.deepEqual(configured.settings.categories, ['discord']);
+
+    // Cualquiera añade invitados; solo quien lo añadió o el host lo quita.
+    assert.equal((await b.call('guest:add', { name: '  Shakira ' })).ok, true);
+    assert.equal((await c.call('guest:add', { name: 'shakira' })).ok, false);
+    assert.equal((await c.call('guest:add', { name: 'carla' })).ok, false);
+    const withGuest = await c.until((s) => s.guests.length === 1);
+    assert.equal(withGuest.guests[0].name, 'Shakira');
+    assert.equal((await c.call('guest:remove', { id: withGuest.guests[0].id })).ok, false);
+    assert.equal((await a.call('guest:remove', { id: withGuest.guests[0].id })).ok, true);
+    await b.call('guest:add', { name: 'Shakira' });
+    await a.until((s) => s.guests.length === 1);
     assert.equal((await a.call('game:start')).ok, true);
 
     const drawing = await b.until((s) => s.phase === 'drawing');

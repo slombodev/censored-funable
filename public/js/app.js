@@ -144,6 +144,16 @@ function renderLobby() {
       </li>`;
   }).join('');
 
+  $('#guest-count').textContent = S.guests.length ? String(S.guests.length) : '';
+  $('#guest-list').innerHTML = S.guests.map((g) => {
+    const removable = g.addedBy === S.me || host;
+    return `
+      <li class="guest">
+        <span>${esc(g.name)}</span>
+        ${removable ? `<button type="button" data-guest="${esc(g.id)}" aria-label="Quitar ${esc(g.name)}" title="Quitar">×</button>` : ''}
+      </li>`;
+  }).join('');
+
   const { rounds, drawTime, categories } = S.settings;
   const dis = host ? '' : 'disabled';
   $('#settings-note').textContent = host ? '' : 'Solo el host';
@@ -157,7 +167,7 @@ function renderLobby() {
     <div class="setting">
       <span class="setting-label">Tiempo para dibujar</span>
       <div class="seg" data-setting="drawTime">
-        ${[60, 90, 120].map((n) => `<button type="button" data-value="${n}" aria-pressed="${n === drawTime}" ${dis}>${n}s</button>`).join('')}
+        ${S.drawTimes.map((n) => `<button type="button" data-value="${n}" aria-pressed="${n === drawTime}" ${dis}>${n < 120 ? `${n}s` : `${n / 60} min`}</button>`).join('')}
       </div>
     </div>
     <div class="setting">
@@ -486,6 +496,22 @@ $('#settings').addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-value]');
   if (!btn || !isHost()) return;
   updateSettings(btn.closest('[data-setting]').dataset.setting, btn.dataset.value);
+});
+
+$('#guest-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const input = $('#guest-name');
+  if (!input.value.trim()) return;
+  const res = await emit('guest:add', { name: input.value });
+  if (res.ok) {
+    input.value = '';
+    sfx.click();
+  }
+  input.focus();
+});
+$('#guest-list').addEventListener('click', (e) => {
+  const btn = e.target.closest('[data-guest]');
+  if (btn) emit('guest:remove', { id: btn.dataset.guest });
 });
 
 const actions = {
