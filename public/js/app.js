@@ -1,9 +1,12 @@
 import { sfx, unlockAudio, toggleMute, isMuted } from './audio.js';
-import { Board, SIZES } from './board.js';
+import { Board, MIN_SIZE, MAX_SIZE } from './board.js';
 import { flyEmoji, confetti, flash, shake } from './fx.js';
 
 const REACTIONS = ['😂', '💀', '🚨', '🤡', '💩'];
-const INK = ['#111111', '#f2c09b', '#ff2d55', '#ff8a00', '#ffd600', '#2bd96b', '#14b8ff', '#7c4dff', '#ff4fd8', '#8b5a2b'];
+const INK = [
+  '#111111', '#ffffff', '#8a8a8a', '#f2c09b', '#c68642', '#8b5a2b', '#ff2d55', '#b3001b', '#ff8a00', '#ffd600',
+  '#fff38a', '#2bd96b', '#0f7a3c', '#14b8ff', '#1f3bff', '#7c4dff', '#ff4fd8', '#ffb3d9',
+];
 const SCREEN_BY_PHASE = { lobby: 'lobby', drawing: 'draw', reveal: 'reveal', voting: 'vote', results: 'results', podium: 'podium' };
 const DRAMA_MS = 1150;
 
@@ -501,22 +504,37 @@ document.addEventListener('click', (e) => {
 });
 
 // Toolbar
-$('#swatches').innerHTML = INK.map((c, i) => `<button class="swatch" type="button" data-color="${c}" style="--sw:${c}" aria-label="Color ${c}" aria-pressed="${i === 0}"></button>`).join('');
-$('#swatches').addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-color]');
-  if (!btn) return;
-  board.color = btn.dataset.color;
-  for (const b of document.querySelectorAll('.swatch')) b.setAttribute('aria-pressed', String(b === btn));
+$('#swatches').innerHTML = INK.map((c, i) => `<button class="swatch" type="button" data-color="${c}" style="--sw:${c}" aria-label="Color ${c}" aria-pressed="${i === 0}"></button>`).join('')
+  + '<label class="swatch custom" title="Color personalizado" style="--sw:conic-gradient(red, yellow, lime, cyan, blue, magenta, red)"><input type="color" id="custom-color" value="#ff6a00" aria-label="Color personalizado"></label>';
+
+function setColor(color, swatch) {
+  board.color = color;
+  for (const b of document.querySelectorAll('.swatch')) b.setAttribute('aria-pressed', String(b === swatch));
+  $('#size-preview').style.background = color;
   if (board.tool === 'eraser') setTool('brush');
-  sfx.click();
-});
-document.querySelector('.sizes').addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-size]');
+}
+$('#swatches').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-color]');
   if (!btn) return;
-  board.sizeIndex = Number(btn.dataset.size);
-  for (const b of document.querySelectorAll('.size')) b.setAttribute('aria-pressed', String(b === btn));
+  setColor(btn.dataset.color, btn);
   sfx.click();
 });
+$('#custom-color').addEventListener('input', (e) => {
+  const swatch = e.target.parentElement;
+  swatch.style.setProperty('--sw', e.target.value);
+  setColor(e.target.value, swatch);
+});
+
+function setSize(size) {
+  board.size = Math.min(MAX_SIZE, Math.max(MIN_SIZE, Math.round(size)));
+  $('#size-range').value = board.size;
+  $('#size-value').textContent = board.size;
+  // La vista previa se limita para no desbordar la barra; a partir de ahí el número manda.
+  $('#size-preview').style.setProperty('--d', `${Math.min(board.size, 40)}px`);
+}
+$('#size-range').addEventListener('input', (e) => setSize(Number(e.target.value)));
+setSize(board.size);
+setColor(board.color, document.querySelector('.swatch'));
 for (const btn of document.querySelectorAll('[data-tool]')) {
   btn.addEventListener('click', () => { setTool(btn.dataset.tool); sfx.click(); });
 }
@@ -531,8 +549,9 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     board.undo();
   } else if (!e.ctrlKey && !e.metaKey && !e.altKey) {
-    const tool = { b: 'brush', e: 'eraser', t: 'text' }[e.key.toLowerCase()];
+    const tool = { b: 'brush', e: 'eraser', f: 'fill', t: 'text', l: 'line', r: 'rect', o: 'ellipse', a: 'arrow' }[e.key.toLowerCase()];
     if (tool) setTool(tool);
+    if (e.key === '[' || e.key === ']') setSize(board.size + (e.key === ']' ? 2 : -2));
   }
 });
 

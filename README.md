@@ -5,7 +5,7 @@ Party game multijugador en tiempo real para jugar en llamadas de Discord. El jue
 ## Cómo se juega
 
 1. **Lobby**: alguien crea la sala (código de 4 letras) y comparte el enlace. El host elige rondas, tiempo (60/90/120 s) y categorías.
-2. **Dibujo**: cada jugador recibe su propio titular con 1 o 2 nombres de la sala y una parte **CENSURADA**. Hay pincel, borrador, texto estilo meme, colores, 3 grosores, deshacer (Ctrl+Z) y limpiar. Atajos: `B` pincel, `E` borrador, `T` texto. Al acabar el tiempo se recogen solos los dibujos.
+2. **Dibujo**: cada jugador recibe su propio titular con 1 o 2 nombres de la sala y una parte **CENSURADA**. Hay pincel, borrador, balde de relleno, texto estilo meme, figuras (línea, rectángulo, círculo, flecha), 18 colores + selector personalizado, grosor libre de 2 a 60 px, deshacer (Ctrl+Z) y limpiar. Atajos: `B` pincel, `E` borrador, `F` balde, `T` texto, `L` `R` `O` `A` figuras, `[` `]` grosor. Al acabar el tiempo se recogen solos los dibujos.
 3. **El Noticiero**: el host va caso por caso. «Quitar la censura» → redoble → la censura se parte y cae → aparece el dibujo y su autor. Todos pueden reaccionar 😂 💀 🚨 🤡 💩 (teclas 1–5) y los emojis vuelan en todas las pantallas.
 4. **Veredicto**: cada jugador vota **🔥 Más Funable** y **🏆 Meme de la Ronda** (no puede votarse a sí mismo). Cada voto recibido son 100 puntos.
 5. Tras la última ronda llega el **podio**, y el host puede lanzar la revancha.
@@ -70,7 +70,7 @@ Detalles que conviene conocer:
 
 ## Añadir titulares
 
-Edita `headlines.js`. Usa `{A}` y `{B}` para los nombres y `___` (una sola vez) para la parte censurada:
+Edita `headlines.js`. Usa `{A}`, `{B}` y `{C}` para los nombres (una plantilla solo sale si hay suficientes jugadores) y `___` (una sola vez) para la parte censurada:
 
 ```js
 '{A} se olvida de silenciar el micro y todo el server escucha ___.',

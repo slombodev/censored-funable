@@ -1,4 +1,4 @@
-// Plantillas de titulares. {A} y {B} se sustituyen por jugadores al azar; ___ es la parte censurada.
+// Plantillas de titulares. {A}, {B} y {C} se sustituyen por jugadores al azar; ___ es la parte censurada.
 export const CATEGORIES = {
   secretos: {
     label: 'Secretos Turbios',
@@ -101,6 +101,45 @@ export const CATEGORIES = {
       'El vecino graba a {A} y {B} en el balcón a las 4 AM ___.',
     ],
   },
+  picante: {
+    label: 'Picante',
+    emoji: '🌶️',
+    templates: [
+      '{A} confiesa que en la cama siempre grita ___.',
+      'Se filtra la lista de deseos de {A} para San Valentín: solo pone ___.',
+      '{A} pierde una apuesta y tiene que mandarle a {B} una foto de ___.',
+      'El tinder de {A} dice en la bio: "Busco a alguien que me haga ___".',
+      '{B} encuentra en la mesita de noche de {A} ___ y un manual de instrucciones.',
+      '{A} intenta seducir a {B} usando únicamente ___.',
+      'La primera cita de {A} acabó en urgencias por culpa de ___.',
+      '{A} se graba haciendo un striptease con ___ de fondo.',
+      'Exclusiva: el fetiche secreto de {A} es ___.',
+      '{A} le susurra a {B} al oído: "esta noche quiero ___".',
+      '{A} pide por Amazon ___ y se lo entregan por error a {B}.',
+      'El "sexting" de {A} se filtra y solo contiene fotos de ___.',
+      '{A} se queda en ropa interior en el juego de la botella y descubrimos ___.',
+    ],
+  },
+  caos: {
+    label: 'Caos Random',
+    emoji: '🎲',
+    templates: [
+      '{A}, {B} y {C} despiertan en Ibiza sin ropa, sin móvil y con ___.',
+      '{A} organiza una cena romántica para {B}, pero {C} aparece con ___.',
+      '{A}, {B} y {C} son detenidos en la frontera disfrazados de ___.',
+      '{C} pilla a {A} y {B} en el baño de la discoteca ___.',
+      '{A}, {B} y {C} forman una boyband. Su primer éxito: "___".',
+      '{A} le pide a {B} que le ayude a esconder ___ antes de que llegue {C}.',
+      'Trío inesperado: {A}, {B} y {C} abren una empresa de ___.',
+      '{A} se emborracha en la boda de {B} y le dedica a {C} ___.',
+      '{A}, {B} y {C} quedan atrapados en un IKEA durante la noche y acaban ___.',
+      '{C} descubre que {A} y {B} llevan años compartiendo ___.',
+      '{A} y {B} se disfrazan de ___ para colarse en el cumpleaños de {C}.',
+      '{A} y {B} intentan grabar un TikTok viral y acaban ___ en mitad de la calle.',
+      '{A} pierde una apuesta contra {B} y tiene que pasear por el centro con ___.',
+      '{A} y {B} se escapan del grupo de viaje y los encuentran ___ en un karaoke.',
+    ],
+  },
 };
 
 const pick = (list) => list[Math.floor(Math.random() * list.length)];
@@ -114,14 +153,17 @@ export function shuffle(list) {
   return out;
 }
 
+// Cuántos nombres distintos pide la plantilla ({A}, {B}, {C}).
+const namesNeeded = (template) => new Set(template.match(/\{[ABC]\}/g)).size;
+
 // Convierte "Pillan a {A} ... ___ ..." en partes que el cliente pinta (nombres resaltados, censura).
 function toParts(template, names) {
   return template
-    .split(/(\{A\}|\{B\}|___)/)
+    .split(/(\{[ABC]\}|___)/)
     .filter(Boolean)
     .map((chunk) => {
       if (chunk === '___') return { type: 'blank' };
-      if (chunk === '{A}' || chunk === '{B}') return { type: 'name', value: names[chunk[1]] };
+      if (/^\{[ABC]\}$/.test(chunk)) return { type: 'name', value: names[chunk[1]] };
       return { type: 'text', value: chunk };
     });
 }
@@ -131,9 +173,9 @@ export function generateHeadline(categoryKeys, playerNames, used) {
   const fitting = (keys) => keys.flatMap((key) =>
     CATEGORIES[key].templates
       .map((template, i) => ({ key, template, id: `${key}:${i}` }))
-      .filter(({ template }) => playerNames.length > 1 || !template.includes('{B}')),
+      .filter(({ template }) => namesNeeded(template) <= playerNames.length),
   );
-  // Con un solo jugador conectado, una selección solo de "Parejas" no tiene plantillas válidas.
+  // Con pocos jugadores conectados, una selección solo de "Parejas" o "Caos" puede no tener plantillas válidas.
   let fits = fitting(categoryKeys);
   if (!fits.length) fits = fitting(Object.keys(CATEGORIES));
   let fresh = fits.filter(({ id }) => !used.has(id));
@@ -143,6 +185,6 @@ export function generateHeadline(categoryKeys, playerNames, used) {
   }
   const chosen = pick(fresh);
   used.add(chosen.id);
-  const [A, B] = shuffle(playerNames);
-  return { category: chosen.key, parts: toParts(chosen.template, { A, B }) };
+  const [A, B, C] = shuffle(playerNames);
+  return { category: chosen.key, parts: toParts(chosen.template, { A, B, C }) };
 }

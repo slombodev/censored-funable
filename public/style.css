@@ -232,7 +232,7 @@ body[data-screen='lobby'] .topbar-code { visibility: hidden; }
 }
 .field { display: grid; gap: 8px; }
 .field span { font: 800 12px/1 var(--ui); letter-spacing: .18em; text-transform: uppercase; color: var(--muted); }
-input:not(.text-input) {
+input:not(.text-input, [type="range"], [type="color"]) {
   width: 100%;
   min-width: 0;
   padding: 15px 16px;
@@ -243,7 +243,7 @@ input:not(.text-input) {
   font-weight: 600;
   transition: border-color .15s, box-shadow .15s;
 }
-input:not(.text-input):focus { outline: none; border-color: var(--lime); box-shadow: 0 0 0 4px rgb(200 255 46 / .15); }
+input:not(.text-input, [type="range"], [type="color"]):focus { outline: none; border-color: var(--lime); box-shadow: 0 0 0 4px rgb(200 255 46 / .15); }
 input::placeholder { color: #5d576b; }
 .or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
 .or::before, .or::after { content: ''; flex: 1; height: 1px; background: var(--line); }
@@ -405,6 +405,7 @@ input::placeholder { color: #5d576b; }
 .stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
 .stage[data-tool='text'] canvas { cursor: text; }
 .stage[data-tool='eraser'] canvas { cursor: cell; }
+.stage[data-tool='fill'] canvas { cursor: copy; }
 .text-input {
   --outline: #000;
   position: absolute;
@@ -449,6 +450,8 @@ input::placeholder { color: #5d576b; }
 }
 .tool-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .tool-group:has(> :nth-child(2):last-child) { grid-template-columns: 1fr 1fr; }
+.tool-group.four { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.tool-group.four .tool { padding-inline: 2px; font-size: 10px; letter-spacing: 0; }
 .tool {
   display: grid;
   justify-items: center;
@@ -465,7 +468,7 @@ input::placeholder { color: #5d576b; }
 .tool:hover { color: var(--text); }
 .tool:active { transform: scale(.94); }
 .tool[aria-pressed='true'] { color: var(--ink); background: var(--lime); border-color: var(--lime); }
-.swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.swatches { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
 .swatch {
   aspect-ratio: 1;
   border-radius: 50%;
@@ -476,21 +479,22 @@ input::placeholder { color: #5d576b; }
 }
 .swatch:hover { transform: scale(1.1); }
 .swatch[aria-pressed='true'] { box-shadow: 0 0 0 3px var(--text); transform: scale(1.12); }
-.sizes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.size {
-  display: grid;
-  place-items: center;
-  height: 42px;
-  border-radius: 10px;
-  border: 2px solid var(--line);
-  background: var(--ink-2);
+.swatch.custom { position: relative; overflow: hidden; cursor: pointer; }
+.swatch.custom input { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+.size-field { display: grid; gap: 8px; }
+.size-head { display: flex; justify-content: space-between; color: var(--muted); font: 800 11px/1 var(--ui); letter-spacing: .04em; text-transform: uppercase; }
+.size-head output { color: var(--text); }
+.size-row { display: grid; grid-template-columns: 1fr 44px; align-items: center; gap: 10px; }
+.size-row input { width: 100%; accent-color: var(--lime); }
+.size-preview {
+  --d: 12px;
+  justify-self: center;
+  width: var(--d);
+  height: var(--d);
+  border-radius: 50%;
+  background: #111;
+  box-shadow: 0 0 0 2px var(--line-2);
 }
-.size i { display: block; border-radius: 50%; background: var(--text); }
-.size[data-size='0'] i { width: 6px; height: 6px; }
-.size[data-size='1'] i { width: 12px; height: 12px; }
-.size[data-size='2'] i { width: 22px; height: 22px; }
-.size[aria-pressed='true'] { border-color: var(--lime); }
-.size[aria-pressed='true'] i { background: var(--lime); }
 
 .status-strip { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
 .status {
@@ -772,7 +776,7 @@ body[data-screen='reveal'] .credit { padding-bottom: 100px; }
 @media (max-width: 520px) {
   #app { padding-inline: 12px; }
   .toolbar { grid-template-columns: 1fr; }
-  .swatches { grid-template-columns: repeat(10, 1fr); gap: 4px; }
+  .swatches { grid-template-columns: repeat(10, 1fr); gap: 5px; }
   .draw-head, .vote-head { grid-template-columns: 1fr 64px; }
   .timer { width: 64px; height: 64px; }
   .timer span { font-size: 22px; }
