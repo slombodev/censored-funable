@@ -15,6 +15,9 @@ export const CATEGORIES = {
       '{A} tiene guardado en favoritos, en una carpeta llamada "Trabajo", ___.',
       'El diario íntimo de {A} revela que cada noche sueña con {B} ___.',
       '{A} confiesa borracho que su crush secreto es ___.',
+      'Pillan a {A} con ___ en el jacuzzi y desde fuera se oyen ruidos raros.',
+      '{A} lleva meses quedando a escondidas con ___. {B} los vio salir de un hotel.',
+      'El fondo de pantalla secreto de {A} es una foto suya abrazando a ___.',
     ],
   },
   madrugada: {
@@ -31,6 +34,9 @@ export const CATEGORIES = {
       'La fiesta en casa de {A} termina con la policía, un bombero y ___.',
       '{A} le escribe "¿estás despierto?" a {B} a las 4 AM junto a una foto de ___.',
       'Encuentran a {A} en la calle a las 6 AM vestido solo con calcetines y ___.',
+      'A las 4 AM sale de casa de {A} ___ con la camisa al revés.',
+      '{A} se despierta en la cama de ___ y no recuerda absolutamente nada.',
+      'Los vecinos de {A} llaman a la policía: en su balcón está ___ cantando rancheras.',
     ],
   },
   crimenes: {
@@ -47,6 +53,9 @@ export const CATEGORIES = {
       '{A} se fuga de prisión usando ___ y la ayuda de {B}.',
       'Detienen a {A} por hacer ___ en mitad de un funeral.',
       'Arrestan a {A} por vender fotos de los pies de {B} haciéndolas pasar por ___.',
+      '{A} es detenido junto a su cómplice: ___.',
+      'Las cámaras graban a {A} y a ___ huyendo de un Mercadona con un carrito lleno.',
+      '{B} identifica en la rueda de reconocimiento a {A} y a ___.',
     ],
   },
   discord: {
@@ -63,6 +72,9 @@ export const CATEGORIES = {
       '{A} cambia su foto de perfil a ___ y nadie se atreve a decir nada.',
       '{A} deja la cámara encendida y todos ven a {B} al fondo ___.',
       '{A} sube a #memes una foto de {B} ___ y la fija en el canal.',
+      '{A} comparte cámara y detrás aparece ___ en toalla.',
+      '{A} deja a {B} en visto toda la noche porque estaba en llamada privada con ___.',
+      'Se filtra que el misterioso moderador que banea a {A} es en realidad ___.',
     ],
   },
   todos: {
@@ -79,6 +91,9 @@ export const CATEGORIES = {
       'Netflix estrena la docuserie de {A}: "___".',
       'Ranking oficial del grupo: {A} es el más ___.',
       '{A} ofrece 50€ al primero que se atreva a ___ delante de {B}.',
+      'Toda la sala sabe que el crush de {A} es ___. Menos {A}.',
+      '{A} anuncia su compromiso con ___. Nadie fue invitado a la boda.',
+      '{B} pilla a {A} haciéndose un tatuaje con la cara de ___.',
     ],
   },
   parejas: {
@@ -99,6 +114,9 @@ export const CATEGORIES = {
       '{A} le pide matrimonio a {B} con ___ en vez de anillo.',
       '{A} y {B} se tatúan juntos ___ en la nalga.',
       'El vecino graba a {A} y {B} en el balcón a las 4 AM ___.',
+      '{A} deja a {B} por ___. El grupo no lo supera.',
+      'Pillan a {A} con ___ en el jacuzzi mientras {B} esperaba fuera con flores.',
+      '{B} descubre que {A} le pone los cuernos con ___.',
     ],
   },
   picante: {
@@ -118,6 +136,10 @@ export const CATEGORIES = {
       '{A} pide por Amazon ___ y se lo entregan por error a {B}.',
       'El "sexting" de {A} se filtra y solo contiene fotos de ___.',
       '{A} se queda en ropa interior en el juego de la botella y descubrimos ___.',
+      'Pillan a {A} con ___ en el probador de Zara. Se oían cosas.',
+      '{A} llega tarde a todo porque "estaba ocupado" con ___.',
+      'Tras la fiesta, {A} amanece desnudo abrazado a ___.',
+      'El vecino de {A} denuncia ruidos toda la noche: estaba con ___.',
     ],
   },
   caos: {
@@ -138,6 +160,9 @@ export const CATEGORIES = {
       '{A} y {B} intentan grabar un TikTok viral y acaban ___ en mitad de la calle.',
       '{A} pierde una apuesta contra {B} y tiene que pasear por el centro con ___.',
       '{A} y {B} se escapan del grupo de viaje y los encuentran ___ en un karaoke.',
+      '{A} y {B} se pelean en la boda de {C} por culpa de ___.',
+      '{A} presenta a su nueva pareja en la cena familiar: ___. {B} se atraganta.',
+      '{A}, {B} y ___ son pillados juntos en una despedida de soltero en Benidorm.',
     ],
   },
 };
