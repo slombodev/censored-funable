@@ -12,6 +12,9 @@ export const CATEGORIES = {
       '{B} revisa el móvil de {A} y descubre una carpeta oculta llena de ___.',
       'Exclusiva: el verdadero motivo por el que {A} nunca contesta mensajes es ___.',
       '{A} y {B} firman un pacto de sangre para que nadie sepa que ___.',
+      '{A} tiene guardado en favoritos, en una carpeta llamada "Trabajo", ___.',
+      'El diario íntimo de {A} revela que cada noche sueña con {B} ___.',
+      '{A} confiesa borracho que su crush secreto es ___.',
     ],
   },
   madrugada: {
@@ -26,6 +29,8 @@ export const CATEGORIES = {
       'Las cámaras del supermercado graban a {A} en pijama ___ de madrugada.',
       '{B} recibe a las 3:33 AM una foto de {A} ___. Sin contexto.',
       'La fiesta en casa de {A} termina con la policía, un bombero y ___.',
+      '{A} le escribe "¿estás despierto?" a {B} a las 4 AM junto a una foto de ___.',
+      'Encuentran a {A} en la calle a las 6 AM vestido solo con calcetines y ___.',
     ],
   },
   crimenes: {
@@ -40,6 +45,8 @@ export const CATEGORIES = {
       '{B} denuncia a {A} por robarle ___ y no devolverlo nunca.',
       'Juicio del siglo: {A} alega que ___ fue en defensa propia.',
       '{A} se fuga de prisión usando ___ y la ayuda de {B}.',
+      'Detienen a {A} por hacer ___ en mitad de un funeral.',
+      'Arrestan a {A} por vender fotos de los pies de {B} haciéndolas pasar por ___.',
     ],
   },
   discord: {
@@ -54,6 +61,8 @@ export const CATEGORIES = {
       'Se filtra el canal privado de {A} y {B}: solo contiene ___.',
       '{A} entra a la llamada y lo primero que se oye es ___.',
       '{A} cambia su foto de perfil a ___ y nadie se atreve a decir nada.',
+      '{A} deja la cámara encendida y todos ven a {B} al fondo ___.',
+      '{A} sube a #memes una foto de {B} ___ y la fija en el canal.',
     ],
   },
   todos: {
@@ -68,6 +77,28 @@ export const CATEGORIES = {
       'Reality show: {A} expulsa a {B} de la casa por ___.',
       '{A} gana el premio a "Peor Amigo del Año" por ___.',
       'Netflix estrena la docuserie de {A}: "___".',
+      'Ranking oficial del grupo: {A} es el más ___.',
+      '{A} ofrece 50€ al primero que se atreva a ___ delante de {B}.',
+    ],
+  },
+  parejas: {
+    label: 'Parejas Funables',
+    emoji: '💞',
+    templates: [
+      'Pillan a {A} y {B} solos en un jacuzzi vestidos de ___.',
+      '{A} y {B} se casan borrachos en Las Vegas. El testigo fue ___.',
+      'Se filtra el TikTok de {A} y {B} bailando ___ en ropa interior.',
+      '{A} y {B} se quedan atrapados 8 horas en un ascensor con ___.',
+      'Los paparazzis cazan a {A} y {B} en una cita romántica dentro de ___.',
+      '{A} y {B} abren un OnlyFans juntos. Su primer post: ___.',
+      'La policía encuentra a {A} y {B} disfrazados de ___ en un motel de carretera.',
+      '{A} y {B} comparten cama en un viaje y amanecen ___.',
+      '{A} y {B} protagonizan la nueva telenovela "Pasión, traición y ___".',
+      'Ven a {A} dándole de comer en la boca a {B} ___.',
+      '{A} y {B} ganan el concurso de parejas del pueblo haciendo ___.',
+      '{A} le pide matrimonio a {B} con ___ en vez de anillo.',
+      '{A} y {B} se tatúan juntos ___ en la nalga.',
+      'El vecino graba a {A} y {B} en el balcón a las 4 AM ___.',
     ],
   },
 };
@@ -97,11 +128,14 @@ function toParts(template, names) {
 
 // `used` es un Set por sala para no repetir titulares hasta agotar el mazo.
 export function generateHeadline(categoryKeys, playerNames, used) {
-  const fits = categoryKeys.flatMap((key) =>
+  const fitting = (keys) => keys.flatMap((key) =>
     CATEGORIES[key].templates
       .map((template, i) => ({ key, template, id: `${key}:${i}` }))
       .filter(({ template }) => playerNames.length > 1 || !template.includes('{B}')),
   );
+  // Con un solo jugador conectado, una selección solo de "Parejas" no tiene plantillas válidas.
+  let fits = fitting(categoryKeys);
+  if (!fits.length) fits = fitting(Object.keys(CATEGORIES));
   let fresh = fits.filter(({ id }) => !used.has(id));
   if (!fresh.length) {
     for (const { id } of fits) used.delete(id);

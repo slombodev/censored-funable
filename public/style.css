@@ -36,6 +36,7 @@ body {
     radial-gradient(1200px 500px at 15% -10%, rgb(200 255 46 / .07), transparent 60%),
     radial-gradient(900px 500px at 110% 10%, rgb(255 45 135 / .08), transparent 60%),
     var(--ink);
+  background-attachment: fixed;
   color: var(--text);
   font: 500 16px/1.45 var(--ui);
   overflow-x: hidden;
@@ -712,6 +713,18 @@ input::placeholder { color: #5d576b; }
 .place-2 .block { height: 130px; }
 .place-3 .block { height: 90px; }
 #podium-rest { width: min(520px, 100%); text-align: left; }
+
+.credit {
+  padding: 28px 16px max(18px, env(safe-area-inset-bottom));
+  text-align: center;
+  font: 600 11px/1 var(--ui);
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text);
+  opacity: .18;
+  user-select: none;
+}
+body[data-screen='reveal'] .credit { padding-bottom: 100px; }
 
 /* ---------- toast + fx ---------- */
 .toast {
