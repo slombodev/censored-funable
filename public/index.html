@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0a0f">
+  <meta name="description" content="Party game: el juego inventa un titular escandaloso con los nombres de tus amigos y tú dibujas lo que hay bajo la censura.">
+  <title>CENSORED! · Edición Funable</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0a0f'/%3E%3Crect x='4' y='12' width='24' height='9' fill='%23000' stroke='%23ff2d87' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bowlby+One&family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="topbar" id="topbar" hidden>
+    <span class="topbar-logo">CENSORED<em>!</em></span>
+    <div class="topbar-right">
+      <span class="topbar-code" id="topbar-code" title="Código de sala"></span>
+      <button class="icon-btn" id="mute-btn" type="button" aria-label="Silenciar sonido"></button>
+      <button class="icon-btn" id="leave-btn" type="button" aria-label="Salir de la sala" title="Salir">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- INICIO -->
+    <section class="screen home" data-screen="home">
+      <div class="hero">
+        <p class="kicker">Party game para tus llamadas de Discord · 2–12 acusados</p>
+        <h1 class="logo">CENSORED<em>!</em></h1>
+        <div class="logo-bar" aria-hidden="true"><span>EDICIÓN FUNABLE</span></div>
+        <p class="pitch">El juego se inventa un titular escandaloso con los nombres de tus amigos. Tú dibujas lo que hay <strong>debajo de la censura</strong>. Después se revela delante de todos. Sin piedad.</p>
+      </div>
+      <form class="join-card" id="home-form" novalidate>
+        <label class="field">
+          <span>Tu apodo</span>
+          <input id="name" maxlength="16" autocomplete="nickname" placeholder="ej. ElTurbio" required>
+        </label>
+        <button class="btn btn-lime btn-block" type="submit">Crear sala</button>
+        <div class="or"><span>o entra con un código</span></div>
+        <div class="join-row">
+          <input id="code" class="code-input" maxlength="4" placeholder="FUNA" autocapitalize="characters" autocomplete="off" spellcheck="false" aria-label="Código de sala">
+          <button class="btn btn-pink" id="join-btn" type="button">Entrar</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- LOBBY -->
+    <section class="screen lobby" data-screen="lobby" hidden>
+      <div class="lobby-head">
+        <span class="eyebrow">Código de sala</span>
+        <button class="room-code" id="copy-code" type="button" title="Copiar enlace de invitación">
+          <span id="lobby-code">----</span>
+        </button>
+        <p class="hint">Toca el código para copiar el enlace y pásalo por el chat.</p>
+      </div>
+      <div class="lobby-grid">
+        <div class="panel">
+          <h2 class="panel-title">Acusados <span class="count" id="player-count"></span></h2>
+          <ul class="player-list" id="player-list"></ul>
+        </div>
+        <div class="panel">
+          <h2 class="panel-title">Reglas del juicio <span class="count" id="settings-note"></span></h2>
+          <div id="settings"></div>
+        </div>
+      </div>
+      <div class="lobby-cta" id="lobby-cta"></div>
+    </section>
+
+    <!-- DIBUJO -->
+    <section class="screen draw" data-screen="draw" hidden>
+      <div class="draw-head">
+        <div class="draw-headline" id="draw-headline"></div>
+        <div class="timer" id="draw-timer"><span data-timer>--</span><small>seg</small></div>
+      </div>
+      <div class="draw-body">
+        <div class="stage-wrap">
+          <div class="stage" id="stage">
+            <canvas id="board" width="960" height="720" aria-label="Lienzo de dibujo"></canvas>
+            <input id="text-input" class="text-input" maxlength="40" autocomplete="off" spellcheck="false" aria-label="Texto para el lienzo" hidden>
+            <div class="stage-lock" id="stage-lock" hidden></div>
+          </div>
+        </div>
+        <div class="toolbar" id="toolbar">
+          <div class="tool-group" role="radiogroup" aria-label="Herramienta">
+            <button class="tool" data-tool="brush" type="button" aria-pressed="true" title="Pincel (B)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20c2.5 0 4-1.2 4-3.2a2.4 2.4 0 0 0-4.8 0c0 1.4-.4 2.4-1.2 3.2h2zM9.2 14.6 20 3.8M7.8 13.2 18.6 2.4"/></svg>
+              <span>Pincel</span>
+            </button>
+            <button class="tool" data-tool="eraser" type="button" aria-pressed="false" title="Borrador (E)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 20 -4-4L14 5l6 6-9 9H7zM20 20H11M9 9l6 6"/></svg>
+              <span>Borrar</span>
+            </button>
+            <button class="tool" data-tool="text" type="button" aria-pressed="false" title="Texto meme (T)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6V4h14v2M12 4v16M9 20h6"/></svg>
+              <span>Texto</span>
+            </button>
+          </div>
+          <div class="swatches" id="swatches" role="radiogroup" aria-label="Color"></div>
+          <div class="sizes" role="radiogroup" aria-label="Grosor">
+            <button class="size" data-size="0" type="button" aria-label="Fino"><i></i></button>
+            <button class="size" data-size="1" type="button" aria-label="Medio" aria-pressed="true"><i></i></button>
+            <button class="size" data-size="2" type="button" aria-label="Gordo"><i></i></button>
+          </div>
+          <div class="tool-group">
+            <button class="tool" id="undo-btn" type="button" title="Deshacer (Ctrl+Z)">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></svg>
+              <span>Deshacer</span>
+            </button>
+            <button class="tool" id="clear-btn" type="button" title="Limpiar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg>
+              <span>Limpiar</span>
+            </button>
+          </div>
+          <button class="btn btn-lime btn-block" id="submit-drawing" type="button">Entregar prueba</button>
+        </div>
+      </div>
+      <ul class="status-strip" id="draw-status" aria-label="Quién ha entregado"></ul>
+    </section>
+
+    <!-- REVELACIÓN -->
+    <section class="screen reveal" data-screen="reveal" hidden>
+      <div class="reveal-top">
+        <p class="eyebrow on-air"><i></i> En directo · El Noticiero de la Funa</p>
+        <p class="eyebrow" id="reveal-count"></p>
+      </div>
+      <div class="reveal-stage" id="reveal-stage">
+        <div id="reveal-clip"></div>
+        <div class="evidence" id="evidence"></div>
+        <p class="byline" id="reveal-byline"></p>
+      </div>
+      <div class="reveal-controls" id="reveal-controls"></div>
+      <div class="reactions" id="reactions" aria-label="Reacciones"></div>
+    </section>
+
+    <!-- VOTACIÓN -->
+    <section class="screen vote" data-screen="vote" hidden>
+      <div class="vote-head">
+        <div>
+          <h2 class="screen-title">Veredicto popular</h2>
+          <p class="hint">Un voto para <b class="c-pink">🔥 Más Funable</b> y otro para <b class="c-lime">🏆 Meme de la Ronda</b>. Puedes cambiarlo hasta que se acabe el tiempo.</p>
+        </div>
+        <div class="timer"><span data-timer>--</span><small>seg</small></div>
+      </div>
+      <div class="vote-grid" id="vote-grid"></div>
+      <ul class="status-strip" id="vote-status" aria-label="Quién ha votado"></ul>
+    </section>
+
+    <!-- RESULTADOS -->
+    <section class="screen results" data-screen="results" hidden>
+      <h2 class="screen-title" id="results-title"></h2>
+      <div class="awards" id="awards"></div>
+      <div class="panel scoreboard-panel">
+        <h3 class="panel-title">Ranking de la vergüenza</h3>
+        <ol class="scoreboard" id="scoreboard"></ol>
+      </div>
+      <div class="lobby-cta" id="results-cta"></div>
+    </section>
+
+    <!-- PODIO -->
+    <section class="screen podium" data-screen="podium" hidden>
+      <p class="eyebrow">Sentencia final</p>
+      <h2 class="screen-title">El más funado del grupo</h2>
+      <div class="podium-stage" id="podium-stage"></div>
+      <ol class="scoreboard" id="podium-rest"></ol>
+      <div class="lobby-cta" id="podium-cta"></div>
+    </section>
+  </main>
+
+  <div id="fx" aria-hidden="true"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
