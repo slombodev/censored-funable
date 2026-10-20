@@ -428,7 +428,9 @@ input::placeholder { color: #5d576b; }
   overflow: hidden;
   background: #fff;
 }
-.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+.stage canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; transform-origin: 0 0; }
+.stage[data-tool='pan'] canvas { cursor: grab; }
+.stage[data-panning] canvas { cursor: grabbing; }
 .stage[data-tool='text'] canvas { cursor: text; }
 .stage[data-tool='eraser'] canvas { cursor: cell; }
 .stage[data-tool='fill'] canvas { cursor: copy; }
@@ -478,6 +480,17 @@ input::placeholder { color: #5d576b; }
 .tool-group:has(> :nth-child(2):last-child) { grid-template-columns: 1fr 1fr; }
 .tool-group.four { grid-template-columns: repeat(4, 1fr); gap: 5px; }
 .tool-group.four .tool { padding-inline: 2px; font-size: 10px; letter-spacing: 0; }
+.brushes .tool[aria-pressed='true'] { color: var(--ink); background: var(--pink); border-color: var(--pink); }
+.zoom-row { display: grid; grid-template-columns: 44px 1fr 44px 44px; gap: 5px; }
+.zoom-row .tool { padding: 8px 0; }
+.zoom-row .tool:disabled { opacity: .35; cursor: default; }
+.zoom-level {
+  border-radius: 10px;
+  border: 2px solid var(--line);
+  background: var(--ink-2);
+  color: var(--text);
+  font: 800 13px/1 var(--ui);
+}
 .tool {
   display: grid;
   justify-items: center;

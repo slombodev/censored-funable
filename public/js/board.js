@@ -4,12 +4,25 @@ export const BOARD_H = 720;
 export const MIN_SIZE = 2;
 export const MAX_SIZE = 60;
 export const SHAPES = ['line', 'rect', 'ellipse', 'arrow'];
+export const BRUSHES = ['normal', 'marker', 'spray', 'neon'];
+export const MAX_ZOOM = 4;
 const BG = '#ffffff';
 const FILL_TOLERANCE = 48; // diferencia máx. por canal para que el balde atraviese bordes antialias
 const MEME_FONT = 'Anton, Impact, "Arial Black", sans-serif';
 
 const mid = (a, b) => ({ x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 });
 const textSize = (brush) => Math.min(120, Math.round(24 + brush * 2.4));
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+
+// PRNG con semilla: el spray se repinta idéntico al deshacer.
+function mulberry32(seed) {
+  return () => {
+    seed = (seed + 0x6d2b79f5) | 0;
+    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 function rgb(hex) {
   const n = parseInt(hex.slice(1), 16);
@@ -30,14 +43,23 @@ export class Board {
     this.tool = 'brush';
     this.color = '#111111';
     this.size = 12;
+    this.brush = 'normal';
     this.locked = false;
     this.onChange = () => {};
+    this.onView = () => {};
+    // Vista: el zoom es solo CSS sobre el canvas; pan en fracción del tamaño del lienzo (sobrevive a resizes).
+    this.zoom = 1;
+    this.pan = { x: 0, y: 0 };
 
     canvas.addEventListener('pointerdown', (e) => this.#down(e));
     canvas.addEventListener('pointermove', (e) => this.#move(e));
     canvas.addEventListener('pointerup', () => this.#up());
     canvas.addEventListener('pointercancel', () => this.#up());
     canvas.addEventListener('contextmenu', (e) => e.preventDefault()); // clic derecho = borrar
+    canvas.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      this.setZoom(this.zoom * (e.deltaY < 0 ? 1.25 : 0.8), this.#viewPoint(e));
+    }, { passive: false });
     textInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') { e.preventDefault(); this.commitText(); }
       if (e.key === 'Escape') { this.pendingText = null; this.input.hidden = true; }
@@ -52,7 +74,30 @@ export class Board {
     this.shape = null;
     this.pendingText = null;
     this.input.hidden = true;
+    this.setZoom(1);
     this.redraw();
+  }
+
+  // `at` es el punto del visor (0–1) que se queda fijo al hacer zoom; por defecto, el centro.
+  setZoom(zoom, at = { x: 0.5, y: 0.5 }) {
+    const next = clamp(zoom, 1, MAX_ZOOM);
+    for (const axis of ['x', 'y']) this.pan[axis] = at[axis] - ((at[axis] - this.pan[axis]) * next) / this.zoom;
+    this.zoom = next;
+    this.#applyView();
+  }
+
+  #applyView() {
+    this.pan.x = clamp(this.pan.x, 1 - this.zoom, 0);
+    this.pan.y = clamp(this.pan.y, 1 - this.zoom, 0);
+    this.canvas.style.transform = this.zoom === 1
+      ? ''
+      : `translate(${this.pan.x * 100}%, ${this.pan.y * 100}%) scale(${this.zoom})`;
+    this.onView();
+  }
+
+  #viewPoint(e) {
+    const r = this.canvas.parentElement.getBoundingClientRect();
+    return { x: (e.clientX - r.left) / r.width, y: (e.clientY - r.top) / r.height };
   }
 
   setLocked(locked) {
@@ -128,6 +173,14 @@ export class Board {
   }
 
   #down(e) {
+    // Mover la vista (herramienta mano o botón central) funciona aunque el dibujo esté entregado.
+    if (this.tool === 'pan' || e.button === 1) {
+      e.preventDefault();
+      this.canvas.setPointerCapture(e.pointerId);
+      this.panning = { x: e.clientX, y: e.clientY, pan: { ...this.pan }, rect: this.canvas.parentElement.getBoundingClientRect() };
+      this.canvas.parentElement.dataset.panning = '';
+      return;
+    }
     const rightClick = e.button === 2;
     if (this.locked || (e.button > 0 && !rightClick)) return;
     e.preventDefault();
@@ -135,105 +188,85 @@ export class Board {
     this.commitText();
     if (this.tool === 'fill' && !rightClick) return this.#addFill(this.#point(e));
     this.canvas.setPointerCapture(e.pointerId);
+    // La vista previa se pinta sobre una copia del lienzo en vez de repintar todo el historial.
+    this.snapshot = this.ctx.getImageData(0, 0, BOARD_W, BOARD_H);
     const { size } = this;
     if (SHAPES.includes(this.tool) && !rightClick) {
       const p = this.#point(e);
-      // La vista previa se pinta sobre una copia del lienzo en vez de repintar todo el historial.
-      this.snapshot = this.ctx.getImageData(0, 0, BOARD_W, BOARD_H);
       this.shape = { type: 'shape', shape: this.tool, color: this.color, size, from: p, to: p };
       return;
     }
     const eraser = this.tool === 'eraser' || rightClick;
     this.stroke = {
       type: 'stroke',
+      brush: eraser ? 'normal' : this.brush,
       color: eraser ? BG : this.color,
       size: eraser ? size * 2.2 : size,
+      seed: Math.floor(Math.random() * 2 ** 31),
       points: [this.#point(e)],
     };
-    this.#dot(this.stroke);
+    this.#drawStroke(this.stroke);
   }
 
   #move(e) {
+    if (this.panning) {
+      const { x, y, pan, rect } = this.panning;
+      this.pan = { x: pan.x + (e.clientX - x) / rect.width, y: pan.y + (e.clientY - y) / rect.height };
+      return this.#applyView();
+    }
     if (this.shape) {
       this.shape.to = this.#point(e);
-      this.ctx.putImageData(this.snapshot, 0, 0);
-      this.#drawShape(this.shape);
+    } else if (this.stroke) {
+      const pts = this.stroke.points;
+      const events = e.getCoalescedEvents?.() ?? [];
+      for (const ev of events.length ? events : [e]) {
+        const p = this.#point(ev);
+        const last = pts[pts.length - 1];
+        if (Math.hypot(p.x - last.x, p.y - last.y) >= 1.5 / this.zoom) pts.push(p);
+      }
+    } else {
       return;
     }
-    if (!this.stroke) return;
-    const events = e.getCoalescedEvents?.() ?? [];
-    for (const ev of events.length ? events : [e]) this.#extend(this.#point(ev));
-  }
-
-  // Trazo suavizado por puntos medios; el repintado en #drawStroke usa la misma curva.
-  #extend(p) {
-    const pts = this.stroke.points;
-    const last = pts[pts.length - 1];
-    if (Math.hypot(p.x - last.x, p.y - last.y) < 1.5) return;
-    pts.push(p);
-    const n = pts.length;
-    const ctx = this.#style(this.stroke);
-    ctx.beginPath();
-    if (n === 2) {
-      const m = mid(pts[0], pts[1]);
-      ctx.moveTo(pts[0].x, pts[0].y);
-      ctx.lineTo(m.x, m.y);
-    } else {
-      const a = mid(pts[n - 3], pts[n - 2]);
-      const b = mid(pts[n - 2], pts[n - 1]);
-      ctx.moveTo(a.x, a.y);
-      ctx.quadraticCurveTo(pts[n - 2].x, pts[n - 2].y, b.x, b.y);
-    }
-    ctx.stroke();
+    // Repintar el trazo entero evita que las transparencias y el brillo se acumulen en cada tramo.
+    this.ctx.putImageData(this.snapshot, 0, 0);
+    if (this.shape) this.#drawShape(this.shape);
+    else this.#drawStroke(this.stroke);
   }
 
   #up() {
-    if (this.shape) {
-      const { shape } = this;
-      this.shape = null;
-      this.snapshot = null;
-      if (Math.hypot(shape.to.x - shape.from.x, shape.to.y - shape.from.y) < 3) return this.redraw();
-      this.actions.push(shape);
-      this.onChange();
+    if (this.panning) {
+      this.panning = null;
+      delete this.canvas.parentElement.dataset.panning;
       return;
     }
-    if (!this.stroke) return;
-    const pts = this.stroke.points;
-    if (pts.length > 1) {
-      const ctx = this.#style(this.stroke);
-      const m = mid(pts[pts.length - 2], pts[pts.length - 1]);
-      ctx.beginPath();
-      ctx.moveTo(m.x, m.y);
-      ctx.lineTo(pts[pts.length - 1].x, pts[pts.length - 1].y);
-      ctx.stroke();
-    }
-    this.actions.push(this.stroke);
+    const action = this.shape ?? this.stroke;
+    if (!action) return;
+    this.shape = null;
     this.stroke = null;
+    this.snapshot = null;
+    if (action.type === 'shape' && Math.hypot(action.to.x - action.from.x, action.to.y - action.from.y) < 3) return this.redraw();
+    this.actions.push(action);
     this.onChange();
   }
 
   #style({ color, size }) {
     const { ctx } = this;
     ctx.strokeStyle = color;
+    ctx.fillStyle = color;
     ctx.lineWidth = size;
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
     return ctx;
   }
 
-  #dot({ color, size, points: [p] }) {
+  // Trazo suavizado por puntos medios.
+  #tracePath(pts) {
     const { ctx } = this;
-    ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.arc(p.x, p.y, size / 2, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  #drawStroke(stroke) {
-    const pts = stroke.points;
-    if (pts.length === 1) return this.#dot(stroke);
-    const ctx = this.#style(stroke);
-    ctx.beginPath();
+    if (pts.length === 1) {
+      ctx.arc(pts[0].x, pts[0].y, ctx.lineWidth / 2, 0, Math.PI * 2);
+      return ctx.fill();
+    }
     ctx.moveTo(pts[0].x, pts[0].y);
     const first = mid(pts[0], pts[1]);
     ctx.lineTo(first.x, first.y);
@@ -244,6 +277,42 @@ export class Board {
     const last = pts[pts.length - 1];
     ctx.lineTo(last.x, last.y);
     ctx.stroke();
+  }
+
+  #drawStroke(stroke) {
+    const { ctx } = this;
+    const { brush, color, size, points } = stroke;
+    ctx.save();
+    this.#style(stroke);
+    if (brush === 'marker') {
+      ctx.globalAlpha = 0.4;
+      ctx.lineWidth = size * 1.6;
+      ctx.lineCap = 'square';
+      this.#tracePath(points);
+    } else if (brush === 'neon') {
+      ctx.shadowColor = color;
+      ctx.shadowBlur = Math.max(10, size * 1.4);
+      this.#tracePath(points);
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = ctx.fillStyle = '#ffffff';
+      ctx.lineWidth = Math.max(1, size * 0.35);
+      this.#tracePath(points);
+    } else if (brush === 'spray') {
+      const rand = mulberry32(stroke.seed);
+      const radius = size * 1.1;
+      const dots = Math.round(size * 1.5) + 6;
+      const dot = Math.max(1.5, size / 8);
+      for (const p of points) {
+        for (let i = 0; i < dots; i++) {
+          const angle = rand() * Math.PI * 2;
+          const dist = Math.sqrt(rand()) * radius;
+          ctx.fillRect(p.x + Math.cos(angle) * dist, p.y + Math.sin(angle) * dist, dot, dot);
+        }
+      }
+    } else {
+      this.#tracePath(points);
+    }
+    ctx.restore();
   }
 
   #drawShape({ shape, color, size, from, to }) {
@@ -348,12 +417,14 @@ export class Board {
   #openText(e) {
     this.commitText();
     const p = this.#point(e);
+    // El input vive en el visor (sin zoom); el tamaño de letra sí sigue al canvas ampliado.
     const r = this.canvas.getBoundingClientRect();
+    const view = this.canvas.parentElement.getBoundingClientRect();
     const size = textSize(this.size);
     this.pendingText = { x: p.x, y: p.y, color: this.color, size };
     Object.assign(this.input.style, {
-      left: `${e.clientX - r.left}px`,
-      top: `${e.clientY - r.top}px`,
+      left: `${e.clientX - view.left}px`,
+      top: `${e.clientY - view.top}px`,
       fontSize: `${size * (r.width / BOARD_W)}px`,
       color: this.color,
     });

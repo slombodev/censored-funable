@@ -109,6 +109,24 @@
               <span>Texto</span>
             </button>
           </div>
+          <div class="tool-group four brushes" role="radiogroup" aria-label="Tipo de pincel">
+            <button class="tool" data-brush="normal" type="button" aria-pressed="true" title="Pincel normal">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18c3-6 6 2 9-4s5-2 7-6"/></svg>
+              <span>Normal</span>
+            </button>
+            <button class="tool" data-brush="marker" type="button" aria-pressed="false" title="Marcador translúcido">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4l6 6-8 8H6v-6zM4 21h9"/></svg>
+              <span>Marcador</span>
+            </button>
+            <button class="tool" data-brush="spray" type="button" aria-pressed="false" title="Spray">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10h6v11H7zM9 10V7h2v3M15 6h.01M18 4h.01M18 8h.01M21 6h.01M16 10h.01"/></svg>
+              <span>Spray</span>
+            </button>
+            <button class="tool" data-brush="neon" type="button" aria-pressed="false" title="Neón">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>Neón</span>
+            </button>
+          </div>
           <div class="tool-group four" role="radiogroup" aria-label="Figuras">
             <button class="tool" data-tool="line" type="button" aria-pressed="false" title="Línea (L)">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5"/></svg>
@@ -135,6 +153,18 @@
               <i class="size-preview" id="size-preview"></i>
             </span>
           </label>
+          <div class="zoom-row" aria-label="Zoom">
+            <button class="tool" id="zoom-out" type="button" title="Alejar (-)" aria-label="Alejar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.9-4.9M7.5 10.5h6"/></svg>
+            </button>
+            <button class="zoom-level" id="zoom-level" type="button" title="Restablecer zoom (0)">100%</button>
+            <button class="tool" id="zoom-in" type="button" title="Acercar (+ o rueda del ratón)" aria-label="Acercar">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.9-4.9M7.5 10.5h6M10.5 7.5v6"/></svg>
+            </button>
+            <button class="tool" data-tool="pan" type="button" aria-pressed="false" title="Mover la vista (H o botón central)" aria-label="Mover la vista">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18M12 3 9.5 5.5M12 3l2.5 2.5M12 21l-2.5-2.5M12 21l2.5-2.5M3 12l2.5-2.5M3 12l2.5 2.5M21 12l-2.5-2.5M21 12l-2.5 2.5"/></svg>
+            </button>
+          </div>
           <div class="tool-group">
             <button class="tool" id="undo-btn" type="button" title="Deshacer (Ctrl+Z)">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 14 4 9l5-5M4 9h10a6 6 0 0 1 0 12h-3"/></svg>

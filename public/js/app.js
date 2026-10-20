@@ -1,5 +1,5 @@
 import { sfx, unlockAudio, toggleMute, isMuted } from './audio.js';
-import { Board, MIN_SIZE, MAX_SIZE } from './board.js';
+import { Board, MIN_SIZE, MAX_SIZE, MAX_ZOOM } from './board.js';
 import { flyEmoji, confetti, flash, shake } from './fx.js';
 
 const REACTIONS = ['😂', '💀', '🚨', '🤡', '💩'];
@@ -564,6 +564,25 @@ setColor(board.color, document.querySelector('.swatch'));
 for (const btn of document.querySelectorAll('[data-tool]')) {
   btn.addEventListener('click', () => { setTool(btn.dataset.tool); sfx.click(); });
 }
+for (const btn of document.querySelectorAll('[data-brush]')) {
+  btn.addEventListener('click', () => {
+    board.brush = btn.dataset.brush;
+    for (const b of document.querySelectorAll('[data-brush]')) b.setAttribute('aria-pressed', String(b === btn));
+    setTool('brush');
+    sfx.click();
+  });
+}
+
+const ZOOM_STEP = 1.5;
+board.onView = () => {
+  $('#zoom-level').textContent = `${Math.round(board.zoom * 100)}%`;
+  $('#zoom-out').disabled = board.zoom <= 1;
+  $('#zoom-in').disabled = board.zoom >= MAX_ZOOM;
+};
+board.onView();
+$('#zoom-in').addEventListener('click', () => board.setZoom(board.zoom * ZOOM_STEP));
+$('#zoom-out').addEventListener('click', () => board.setZoom(board.zoom / ZOOM_STEP));
+$('#zoom-level').addEventListener('click', () => board.setZoom(1));
 $('#undo-btn').addEventListener('click', () => board.undo() && sfx.click());
 $('#clear-btn').addEventListener('click', () => board.clear() && sfx.submit());
 $('#submit-drawing').addEventListener('click', submitDrawing);
@@ -575,8 +594,11 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault();
     board.undo();
   } else if (!e.ctrlKey && !e.metaKey && !e.altKey) {
-    const tool = { b: 'brush', e: 'eraser', f: 'fill', t: 'text', l: 'line', r: 'rect', o: 'ellipse', a: 'arrow' }[e.key.toLowerCase()];
+    const tool = { b: 'brush', e: 'eraser', f: 'fill', t: 'text', l: 'line', r: 'rect', o: 'ellipse', a: 'arrow', h: 'pan' }[e.key.toLowerCase()];
     if (tool) setTool(tool);
+    if (e.key === '+' || e.key === '=') board.setZoom(board.zoom * ZOOM_STEP);
+    if (e.key === '-') board.setZoom(board.zoom / ZOOM_STEP);
+    if (e.key === '0') board.setZoom(1);
     if (e.key === '[' || e.key === ']') setSize(board.size + (e.key === ']' ? 2 : -2));
   }
 });
