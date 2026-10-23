@@ -70,6 +70,7 @@ export class Board {
 
   reset() {
     this.actions = [];
+    this.redone = [];
     this.stroke = null;
     this.shape = null;
     this.pendingText = null;
@@ -108,16 +109,31 @@ export class Board {
   undo() {
     this.commitText();
     if (!this.actions.length) return false;
-    this.actions.pop();
+    this.redone.push(this.actions.pop());
     this.redraw();
     this.onChange();
     return true;
   }
 
+  redo() {
+    this.commitText();
+    if (!this.redone.length) return false;
+    this.actions.push(this.redone.pop());
+    this.redraw();
+    this.onChange();
+    return true;
+  }
+
+  // Un trazo nuevo invalida lo deshecho, como en cualquier editor.
+  #push(action) {
+    this.actions.push(action);
+    this.redone = [];
+  }
+
   clear() {
     this.commitText();
     if (this.isEmpty()) return false;
-    this.actions.push({ type: 'clear' });
+    this.#push({ type: 'clear' });
     this.redraw();
     this.onChange();
     return true;
@@ -162,7 +178,7 @@ export class Board {
     this.input.hidden = true;
     if (!text) return;
     const action = { type: 'text', ...pending, text };
-    this.actions.push(action);
+    this.#push(action);
     this.#drawText(action);
     this.onChange();
   }
@@ -245,7 +261,7 @@ export class Board {
     this.stroke = null;
     this.snapshot = null;
     if (action.type === 'shape' && Math.hypot(action.to.x - action.from.x, action.to.y - action.from.y) < 3) return this.redraw();
-    this.actions.push(action);
+    this.#push(action);
     this.onChange();
   }
 
@@ -342,7 +358,7 @@ export class Board {
   #addFill(p) {
     const action = { type: 'fill', x: Math.floor(p.x), y: Math.floor(p.y), color: this.color };
     if (!this.#fill(action)) return;
-    this.actions.push(action);
+    this.#push(action);
     this.onChange();
   }
 

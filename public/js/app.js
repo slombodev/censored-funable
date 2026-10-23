@@ -584,13 +584,18 @@ $('#zoom-in').addEventListener('click', () => board.setZoom(board.zoom * ZOOM_ST
 $('#zoom-out').addEventListener('click', () => board.setZoom(board.zoom / ZOOM_STEP));
 $('#zoom-level').addEventListener('click', () => board.setZoom(1));
 $('#undo-btn').addEventListener('click', () => board.undo() && sfx.click());
+$('#redo-btn').addEventListener('click', () => board.redo() && sfx.click());
 $('#clear-btn').addEventListener('click', () => board.clear() && sfx.submit());
 $('#submit-drawing').addEventListener('click', submitDrawing);
 setTool('brush');
 
 document.addEventListener('keydown', (e) => {
   if (screen !== 'draw' || document.activeElement === $('#text-input')) return;
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+  const key = e.key.toLowerCase();
+  if ((e.ctrlKey || e.metaKey) && (key === 'y' || (key === 'z' && e.shiftKey))) {
+    e.preventDefault();
+    board.redo();
+  } else if ((e.ctrlKey || e.metaKey) && key === 'z') {
     e.preventDefault();
     board.undo();
   } else if (!e.ctrlKey && !e.metaKey && !e.altKey) {
